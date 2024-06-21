@@ -1,23 +1,29 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, FormEvent, ChangeEvent } from 'react';
 import { io, Socket } from 'socket.io-client';
 import NavBar from './NavBar';
 
+interface Message {
+    id: string;
+    username?: string;
+    message: string;
+}
+
 function ChatRoom() {
-    const [messages, setMessages] = useState<any[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [inputText, setInputText] = useState('');
     const [socket, setSocket] = useState<Socket | null>(null);
     const userId = localStorage.getItem('userId');
     const username = localStorage.getItem('username');
 
     useEffect(() => {
-        const newSocket: Socket = io('http://localhost:8000')
+        const newSocket: Socket = io('http://localhost:8000');
 
         newSocket.on('connect', () => {
             console.log('Connected:', newSocket.id);
             newSocket.emit('join', { userId });
         });
 
-        newSocket.on('message', (data: any) => {
+        newSocket.on('message', (data: Message) => {
             setMessages(prev => [...prev, data]);
         });
 
@@ -32,7 +38,7 @@ function ChatRoom() {
         };
     }, [userId]);
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (inputText.trim() && socket) {
             socket.emit('chatMessage', inputText);
@@ -40,7 +46,7 @@ function ChatRoom() {
         }
     };
 
-    const handleInputChange = (e: any) => {
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setInputText(e.target.value);
     };
 
