@@ -1,15 +1,9 @@
-import React, { useEffect, useState, FormEvent, ChangeEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import NavBar from './NavBar';
 
-interface Message {
-    id: string;
-    username?: string;
-    message: string;
-}
-
 function ChatRoom() {
-    const [messages, setMessages] = useState<Message[]>([]);
+    const [messages, setMessages] = useState<any[]>([]);
     const [inputText, setInputText] = useState('');
     const [socket, setSocket] = useState<Socket | null>(null);
     const userId = localStorage.getItem('userId');
@@ -23,7 +17,7 @@ function ChatRoom() {
             newSocket.emit('join', { userId });
         });
 
-        newSocket.on('message', (data: Message) => {
+        newSocket.on('message', (data: any) => {
             setMessages(prev => [...prev, data]);
         });
 
